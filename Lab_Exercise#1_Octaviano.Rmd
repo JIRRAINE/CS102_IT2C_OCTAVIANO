@@ -9,55 +9,68 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-install.packages("tidyverse")
 install.packages("dplyr")
 install.packages("rvest")
 install.packages("httr")
 install.packages("polite")
-install.packages("ggplot2")
-install.packages("kableExtra")
 
-library(tidyverse)
 library(dplyr)
 library(rvest)
 library(httr)
 library(polite)
-library(ggplot2)
-library(kableExtra)
+
 polite::use_manners(save_as = 'polite_scrape.R')
 
 ```
 
 ```{r}
-name <- character(100)
-price <- character(100)
-ratings <- character(100)
-reviews <- character(100)
 
-url <-"https://www.amazon.co.uk/s?k=page+t+shirt&crid=P2R3QEJ5K7S0&sprefix=page+t+shirt%2Caps%2C556&ref=nb_sb_noss_2"
+url <-"https://www.amazon.com.au/s?k=watch&rh=n%3A4851856051%2Cp_89%3ACasio&dc&ds=v1%3AS2ltH4Ih3oCwQeYX5MyeSbudTkl3k1DbUmqpqQkvtAk&crid=ZE50TD11CX0I&qid=1707656659&rnid=5373057051&sprefix=watch%2Caps%2C931&ref=sr_nr_p_89_1"
 
 session <- bow(url, user_agent= "Educational Purposes")
 session
 
-#Name
-name <- scrape(session) %>%
-  html_nodes("span.a-size-base-plus.a-color-base.a-text-normal") %>%
-  html_text()
-
-name[1:100]
-
-#Price
-price <- scrape(session) %>%
-  html_nodes("span.a-price-fraction") %>%
-  html_text()
-
-price[1:100]
-
-#Ratings
-ratings <- scrape(session) %>%
-  html_nodes("a-icon.a-icon-star-small.a-star-small-4-5.aok-align-bottom") %>%
-  html_text()
-
-ratings[1:100]
 ```
+SCRAPING FOR WATCH
 
+```{r}
+watch_products <- data.frame()
+
+watchlink1 = "https://www.amazon.com.au/s?k=watch&rh=n%3A4851856051%2Cp_89%3ACasio&dc&ds=v1%3AS2ltH4Ih3oCwQeYX5MyeSbudTkl3k1DbUmqpqQkvtAk&crid=ZE50TD11CX0I&qid=1707656659&rnid=5373057051&sprefix=watch%2Caps%2C931&ref=sr_nr_p_89_1"
+
+session1 <- bow(watchlink1,
+           user_agent = "For Educational Purpose")
+
+scrapeNodes <- function(selector){
+scrape(session) %>%
+  html_nodes(selector) %>%
+  html_text(trim = TRUE)
+}
+
+scrapedCategory <- "Watch"
+
+scrapedName <- scrapeNodes("h2.a-size-mini.a-spacing-none.a-color-base.s-line-clamp-4")
+scrapedName <- scrapedName[1:45]
+
+scrapedPrice <- scrapeNodes("span.a-offscreen")
+scrapedPrice <- scrapedPrice[1:45]
+
+scrapedRatings <- scrapeNodes("span.a-icon-alt")
+scrapedRatings <- scrapedRatings[1:45]
+
+scrapedReviews <- scrapeNodes("span.a-size-base.s-underline-text")
+scrapedReviews <- scrapedReviews[1:45]
+
+
+
+watch_products <- rbind(watch_products, data.frame(category = scrapedCategory,name = scrapedName,
+                    price = scrapedPrice,
+                    ratings = scrapedRatings,
+                    no_of_reviews = scrapedReviews))
+
+View(all_reviews)
+
+
+#install.packages("usethis")
+library(usethis)
+```

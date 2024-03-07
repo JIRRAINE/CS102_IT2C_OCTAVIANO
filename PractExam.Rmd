@@ -3,9 +3,9 @@ title: "Practical_Exam"
 author: "Jirraine Octaviano"
 date: "2024-03-07"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -38,14 +38,16 @@ user-level class. Derive from the following code and error message what the
 underlying type. Explain what is the error all about. Do not just copy the error
 message that was displayed.
 ```{r}
-for (i in 1:ncol(numeric_or_integer_columns)) {
-  if (!is.integer(numeric_or_integer_columns[, i])) {
-    numeric_or_integer_columns[, i] <- as.integer(numeric_or_integer_columns[, i]) 
-  } 
-}
+
+## Factor variables are internally stored as integers, which represent the underlying type. 
+## The operation on such a factor may result in an error mentioning "integer."
+## Despite being treated as a character by the user.
+
+
+## R displays the underlying type, such as integer or numeric, instead of the user-level class, like factors or characters.
+
+## Use functions like as.integer() to convert data to the appropriate type if necessary.
 ```
-ERROR MESSAGE
-##    Error in 1:ncol(numeric_or_integer_columns) : argument of length 0
 
 B. Load the exampleFile.txt
 ```{r}

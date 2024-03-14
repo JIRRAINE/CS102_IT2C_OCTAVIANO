@@ -1,7 +1,7 @@
 ---
-title: "Lab_Exercise#3_Octaviano"
+title: "lab_exercise#3_Octaviano"
 author: "Jirraine Octaviano"
-date: "2024-03-10"
+date: "2024-03-14"
 output: pdf_document
 ---
 

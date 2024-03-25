@@ -2,7 +2,10 @@
 title: "lab_exercise#3_Octaviano"
 author: "Jirraine Octaviano"
 date: "2024-03-14"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -23,7 +26,7 @@ library(selectr)
 
 reviews <- data.frame()
 
-link <- "https://www.imdb.com/title/tt0088763/reviews?ref_=tt_urv"
+link <- "https://www.imdb.com/title/tt0021749/reviews?ref_=tt_urv"
 session1 <- bow(link, user_agent = "Educational Purpose")
 
 scrapeNodes <- function(selector) {
@@ -32,7 +35,7 @@ scrapeNodes <- function(selector) {
     html_text(trim = TRUE)
 }
 
-titleMovie <- "Back to the Future (1985)"
+titleMovie <- "City Lights (1931)"
 scrapedTitle <- scrapeNodes("a.title")[1:10]
 scrapedReviewer <- scrapeNodes(".display-name-link a")[1:10]
 scrapedReview <- scrapeNodes(".collapsable div.text")[1:10]
@@ -50,4 +53,68 @@ reviews <- rbind(reviews, data.frame(
 
 reviews
 
+```
+~   creating connections    ~
+```{r}
+
+library(dplyr,dbplyr)
+library(RMySQL)
+
+#creating connections
+connection <- dbConnect(RMySQL::MySQL(),
+                        dsn="MariaDB-connection",
+                        Server = "localhost",
+                        dbname = "2c_octaviano", 
+                        user = "root", 
+                        password = "") 
+
+```
+
+```{r}
+dbListTables(connection)
+dbListFields(connection,"reviews")
+```
+~   reading data from database    ~
+```{r}
+
+review_data <- dbGetQuery(connection, "SELECT * FROM 2c_octaviano.reviews")
+
+glimpse(review_data)
+
+```
+~   inserting reviews   ~
+```{r}
+
+
+for (i in 1:nrow(reviews)) {
+    query <- paste0("INSERT INTO reviews (movie_title, reviewer_name, review_date, review_rating, review_content, review_title) 
+                  VALUES ('", reviews$movie_title[i],"','", reviews$reviewer_name[i], "','", reviews$review_date[i],"','", reviews$review_rating[i], "','",
+                  gsub("'","''", reviews$review_content[i]), "','", gsub("'","''", reviews$review_title[i]), "')")
+  
+  # execute query
+  query_result <- dbSendQuery(connection, query)
+  
+  # clear result after executing query
+  dbClearResult(query_result)
+}
+
+```
+~   read and view   ~
+```{r}
+
+review_data <- dbGetQuery(connection, "SELECT * FROM 2c_octaviano.reviews")
+
+
+# VIEW REVIEWS without primary key "id"
+review_data[,c(2:7)]
+
+#View(review_data[,c(2:7)])
+
+# Export to csv
+write.csv(review_data[,c(2:7)], "Lab_Exercise#3.csv")
+
+```
+~   closing the database connections    ~
+```{r}
+dbDisconnect(connection)
 ```
